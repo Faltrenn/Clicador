@@ -1,108 +1,70 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CLIQUE!</title>
 
-    <style>
-        body {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0px;
-            position: absolute;
-            background-color: red;
-        }
-        table {
-            display: block;
-            height: 320px;
-            width: 100%;
-            overflow-y: scroll;
-        }
-        td {
-            width: 100%;
-        }
-        .main{
-            width: 40%;
-            justify-content: center;
-            align-items: center;
-        }
-        td, button, input{
-            font-size: 18pt;
-        }
-        button {
-            width: 100%;
-            height: 100px;
-        }
-        input{
-            border: 0px;
-            padding: 0px;
-            width: 100%;
-            height: 50px;
-            text-align: center;
-        }
-        h1, h2 {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-    </style>
-
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
 </head>
 <body>
     <div class="main">
-        {% if playerForm is not None %}
-            <table border="2">
-                <tr>
-                    <th>Player</th>
-                    <th>Score</th>
-                    <th>Likes</th>
-                    <th>Dislikes</th>
-                </tr>
-                {% for match in matches %}
+        <div style="display: flex;flex-direction: column;justify-content: center; padding: 20px 40px 20px 40px;border-radius: 30px; background-color: rgb(66, 18, 199);">
+            {% if playerForm is not None %}
+                <h1 class="title">Ranking de cliques</h1>
+                <table border="2">
                     <tr>
-                        <td>{{match.0.player_id.name}}</td>
-                        <td>{{match.0.score}}</td>
-                        <form method="post">
-                            {% csrf_token %}
-                            <select style="display: none;" name="match_id" id="matchid">
-                                <option value="{{match.0.id}}" selected></option>
-                            </select>
-                            <input style="display: none;" type="text" name="type" value="like">
-                            <td><input type="submit" style="width: 100%;height: 100%;" value="{{match.1}}"></td>
-                        </form>
-                        <form method="post">
-                            {% csrf_token %}
-                            <select style="display: none;" name="match_id" id="matchid">
-                                <option value="{{match.0.id}}" selected></option>
-                            </select>
-                            <input style="display: none;" type="text" name="type" value="dislike">
-                            <td><input type="submit" style="width: 100%;height: 100%;" value="{{match.2}}"></td>
-                        </form>
+                        <th>Player</th>
+                        <th>Score</th>
+                        <th>Likes</th>
+                        <th>Dislikes</th>
                     </tr>
-                {% endfor %}                
-            </table>
-            <form action="" method="post">
-                {% csrf_token %}
-                {{playerForm}}
-                <button>Jogar</button>
-            </form>
-        {% else %}
-            <h1 id="playername">{{player_name.value}}</h1>
-            <h1>
-                Cronometro: <span id="sec"></span>:<span id="milisec"></span>
-            </h1>
-            <h2>
-                Clicks: <span id="clicks"></span>
-            </h2>
-            <button onclick="clk()">CLIQUE!</button>
-        {% endif %}
+                    {% for match in matches %}
+                        <tr>
+                            <td>{{match.0.player_id.name}}</td>
+                            <td>{{match.0.score}}</td>
+                            <form method="post">
+                                {% csrf_token %}
+                                <select style="display: none;" name="match_id" id="matchid">
+                                    <option value="{{match.0.id}}" selected></option>
+                                </select>
+                                <input style="display: none;" type="text" name="type" value="like">
+                                <td><input class="like" type="submit" value="{{match.1}}"></td>
+                            </form>
+                            <form method="post">
+                                {% csrf_token %}
+                                <select style="display: none;" name="match_id" id="matchid">
+                                    <option value="{{match.0.id}}" selected></option>
+                                </select>
+                                <input style="display: none;" type="text" name="type" value="dislike">
+                                <td><input class="like" type="submit" value="{{match.2}}"></td>
+                            </form>
+                        </tr>
+                    {% endfor %}                
+                </table>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {{playerForm}}
+                    <button>Jogar</button>
+                </form>
+            {% else %}
+                <div style="display: flex;justify-content: center;align-items: center;flex-direction: column;padding: 50px 0px 50px 0px;">
+                    <div class="game">
+                        <h1 id="playername">{{player_name.value}}</h1>
+                        <h1>
+                            Cronometro: <span id="sec">10</span>:<span id="milisec">00</span>
+                        </h1>
+                        <h2>
+                            Clicks: <span id="clicks"></span>
+                        </h2>
+                    </div>
+                    <button onclick="clk()" class="clique"></button>
+                </div>
+            {% endif %}
+        </div>
     </div>
-
-
 
 
 
@@ -111,52 +73,6 @@
         <input id = "playerid" name="player_id"></input>
         <input id = "playerscore" name="score"></input>
     </form>
-
-    <script>
-
-        idplayer = 0;
-
-        var seconds = document.getElementById("sec");
-        var miliseconds = document.getElementById("milisec");
-        var countClicks = document.getElementById("clicks");
-
-
-
-        var init = false;
-        var mili = 10000;
-        var sec = 0;
-        var clicks = 0;
-        var inter;
-        function clk(){
-            clicks ++;
-            countClicks.innerText = clicks;
-
-            if(!init){
-                init = true;
-                inter = setInterval(plusMili, 10);
-            }
-        }
-
-        function plusMili(){
-            mili -= 10;
-            sec = Math.floor(mili / 1000);
-            if(sec == 0 && mili == 0){
-                clearInterval(inter);
-            }
-            if(mili == 0){
-                miliseconds.innerText = "00";
-                let form = document.getElementById("saveScore");
-                let playername = document.getElementById("playerid");
-                let player_score = document.getElementById("playerscore");
-                playername.value = document.getElementById("playername").innerText;
-                player_score.value = clicks;
-                form.submit();
-            }else{
-                miliseconds.innerText = mili.toString().substring(1, 3);
-            }
-            seconds.innerText = sec;
-        }
-
-    </script>
+    <script src="{% static 'script.js' %}"></script>
 </body>
 </html>

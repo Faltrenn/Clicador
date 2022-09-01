@@ -1,8 +1,9 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, CharField, TextInput
 from .models import Like, Match, Player
 
 # Create the form class.
 class PlayerForm(ModelForm):
+    name = CharField(label='', widget=TextInput(attrs={"placeholder": "Digite seu nome"}))
     class Meta:
         model = Player
         fields = ["name"]
