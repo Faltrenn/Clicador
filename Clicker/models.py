@@ -15,6 +15,5 @@ class Match(models.Model):
 class Like(models.Model):
     match_id = models.ForeignKey(Match, on_delete=models.CASCADE)
 
-class Hint(models.Model):
-    name = models.CharField(max_length= 12)
-    desc = models.TextField()
+class Dislike(models.Model):
+    match_id = models.ForeignKey(Match, on_delete=models.CASCADE)
